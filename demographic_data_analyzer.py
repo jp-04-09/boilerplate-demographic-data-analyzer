@@ -5,26 +5,31 @@ def calculate_demographic_data(print_data=True):
     # Read data from file
     df = pd.read_csv("adult.data.csv")
     df.info()
+    print(df.head())
 
     # How many of each race are represented in this dataset? This should be a Pandas series with race names as the index labels.
     race_count = df["race"].value_counts()
 
     # What is the average age of men?
-    average_age_men = df.loc[df["sex"].str.strip().str.lower() == "male", "age"].mean()
+    average_age_men = round(df.loc[df["sex"].str.strip().str.lower() == "male", "age"].mean(), 1)
 
     # What is the percentage of people who have a Bachelor's degree?
-    percentage_bachelors = None
+    bachelors = (df["education"].str.strip().str.lower() == "bachelors").sum()
+    percentage_bachelors = round(bachelors * 100 / df.shape[0], 1)
 
     # What percentage of people with advanced education (`Bachelors`, `Masters`, or `Doctorate`) make more than 50K?
     # What percentage of people without advanced education make more than 50K?
 
     # with and without `Bachelors`, `Masters`, or `Doctorate`
-    higher_education = None
-    lower_education = None
+    higher_education = ((df["education"].str.strip().str.lower() == "bachelors") | (df["education"].str.strip().str.lower() == "masters") | (df["education"].str.strip().str.lower() == "doctorate")).sum()
+    lower_education = ((df["education"].str.strip().str.lower() != "bachelors") & (df["education"].str.strip().str.lower() != "masters") & (df["education"].str.strip().str.lower() != "doctorate")).sum()
+
+    higher_education_salary_over_50k = (((df["education"].str.strip().str.lower() == "bachelors") | (df["education"].str.strip().str.lower() == "masters") | (df["education"].str.strip().str.lower() == "doctorate")) & (df["salary"].str.strip().str.lower() == ">50k")).sum()
+    lower_education_salary_over_50k = (((df["education"].str.strip().str.lower() != "bachelors") & (df["education"].str.strip().str.lower() != "masters") & (df["education"].str.strip().str.lower() != "doctorate")) & (df["salary"].str.strip().str.lower() == ">50k")).sum()
 
     # percentage with salary >50K
-    higher_education_rich = None
-    lower_education_rich = None
+    higher_education_rich = round(higher_education_salary_over_50k * 100 / higher_education, 1)
+    lower_education_rich = round(lower_education_salary_over_50k * 100 / lower_education, 1) 
 
     # What is the minimum number of hours a person works per week (hours-per-week feature)?
     min_work_hours = None
